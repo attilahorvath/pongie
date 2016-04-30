@@ -3,8 +3,7 @@
 import Entity from '../entity';
 import SimpleShader from '../shaders/simple_shader';
 
-const mat4 = require('gl-matrix').mat4;
-const vec3 = require('gl-matrix').vec3;
+const vec2 = require('gl-matrix').vec2;
 
 class Ball extends Entity {
   constructor(game) {
@@ -16,10 +15,23 @@ class Ball extends Entity {
       vertices.push(Math.cos(angle), Math.sin(angle), 0.0, 1.0, 1.0, 1.0, 1.0);
     }
 
-    let transformation = mat4.translate(mat4.create(), mat4.create(), vec3.fromValues(100.0, 100.0, 0.0));
-    mat4.scale(transformation, transformation, vec3.fromValues(10.0, 10.0, 1.0));
+    super(game, new SimpleShader(game.renderer), vertices, null, 'TRIANGLE_FAN');
 
-    super(game, new SimpleShader(game.renderer), vertices, null, 'TRIANGLE_FAN', transformation);
+    this.position = vec2.fromValues(100.0, 100.0);
+    this.scaling = vec2.fromValues(10.0, 10.0);
+
+    this.velocity = vec2.fromValues(0.2, 0.1);
+  }
+
+  update(deltaTime) {
+    this.game.entities.forEach(entity => {
+      if (entity !== this && entity.checkBallCollision(this)) {
+        let dot = vec2.dot(entity.normal, this.velocity);
+        vec2.add(this.velocity, this.velocity, vec2.scale(vec2.create(), entity.normal, -2.0 * dot));
+      }
+    });
+
+    super.update(deltaTime);
   }
 }
 

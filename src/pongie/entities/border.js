@@ -3,16 +3,15 @@
 import Entity from '../entity';
 import SimpleShader from '../shaders/simple_shader';
 
-const mat4 = require('gl-matrix').mat4;
-const vec3 = require('gl-matrix').vec3;
+const vec2 = require('gl-matrix').vec2;
 
 class Border extends Entity {
-  constructor(game, y = 0.0) {
+  constructor(game, y = 0.0, normalY = 1.0) {
     const vertices = [
-        0.0,  0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-        0.0, 10.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-      800.0, 10.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-      800.0,  0.0, 0.0, 1.0, 1.0, 1.0, 1.0
+        0.0,  5.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+        0.0, -5.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+      800.0, -5.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+      800.0,  5.0, 0.0, 1.0, 1.0, 1.0, 1.0
     ];
 
     const indices = [
@@ -20,9 +19,17 @@ class Border extends Entity {
       3, 1, 2
     ];
 
-    let transformation = mat4.translate(mat4.create(), mat4.create(), vec3.fromValues(0.0, y, 0.0));
+    super(game, new SimpleShader(game.renderer), vertices, indices);
 
-    super(game, new SimpleShader(game.renderer), vertices, indices, 'TRIANGLES', transformation);
+    this.position = vec2.fromValues(0.0, y);
+
+    this.normal = vec2.fromValues(0.0, normalY);
+  }
+
+  checkBallCollision(ball) {
+    if (Math.abs(ball.position[1] - this.position[1]) <= ball.scaling[1]) {
+      return true;
+    }
   }
 }
 

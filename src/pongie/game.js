@@ -1,6 +1,8 @@
 'use strict';
 
 import Renderer from './renderer';
+import MouseInput from './mouse_input';
+
 import Border from './entities/border';
 import Paddle from './entities/paddle';
 import Ball from './entities/ball';
@@ -8,14 +10,15 @@ import Ball from './entities/ball';
 class Game {
   constructor() {
     this.renderer = new Renderer();
+    this.mouseInput = new MouseInput(this.renderer.canvas);
 
-    this.topBorder = new Border(this);
-    this.bottomBorder = new Border(this, 590.0);
+    this.entities = [];
 
-    this.leftPaddle = new Paddle(this, 10.0);
-    this.rightPaddle = new Paddle(this, 790.0);
-
-    this.ball = new Ball(this);
+    this.entities.push(new Border(this, 5.0, 1.0));
+    this.entities.push(new Border(this, 595.0, -1.0));
+    this.entities.push(new Paddle(this, 10.0, 1.0));
+    this.entities.push(new Paddle(this, 790.0, -1.0));
+    this.entities.push(new Ball(this));
   }
 
   run() {
@@ -27,17 +30,15 @@ class Game {
   loop(currentTime = Date.now()) {
     requestAnimationFrame(() => this.loop());
 
-    //let deltaTime = currentTime - this.lastTime;
+    let deltaTime = currentTime - this.lastTime;
+
+    this.mouseInput.update();
+
+    this.entities.forEach(entity => entity.update(deltaTime));
 
     this.renderer.clear();
 
-    this.topBorder.draw();
-    this.bottomBorder.draw();
-
-    this.leftPaddle.draw();
-    this.rightPaddle.draw();
-
-    this.ball.draw();
+    this.entities.forEach(entity => entity.draw());
 
     this.lastTime = currentTime;
   }

@@ -3,11 +3,10 @@
 import Entity from '../entity';
 import SimpleShader from '../shaders/simple_shader';
 
-const mat4 = require('gl-matrix').mat4;
-const vec3 = require('gl-matrix').vec3;
+const vec2 = require('gl-matrix').vec2;
 
 class Paddle extends Entity {
-  constructor(game, x = 0.0) {
+  constructor(game, x = 0.0, normalX = 1.0) {
     const vertices = [
       -10.0, -50.0, 0.0, 1.0, 1.0, 1.0, 1.0,
       -10.0,  50.0, 0.0, 1.0, 1.0, 1.0, 1.0,
@@ -20,9 +19,35 @@ class Paddle extends Entity {
       3, 1, 2
     ];
 
-    let transformation = mat4.translate(mat4.create(), mat4.create(), vec3.fromValues(x, 150.0, 0.0));
+    super(game, new SimpleShader(game.renderer), vertices, indices);
 
-    super(game, new SimpleShader(game.renderer), vertices, indices, 'TRIANGLES', transformation);
+    this.x = x;
+
+    this.position = vec2.fromValues(this.x, 150.0);
+
+    this.normal = vec2.fromValues(normalX, 0.0);
+  }
+
+  update(deltaTime) {
+    let y = this.game.mouseInput.position[1];
+
+    if (y < 60.0) {
+      y = 60.0;
+    } else if (y > 540.0) {
+      y = 540.0;
+    }
+
+    this.position = vec2.fromValues(this.x, y);
+
+    super.update(deltaTime);
+  }
+
+  checkBallCollision(ball) {
+    if (Math.abs(ball.position[0] - this.position[0]) <= ball.scaling[0]) {
+      if (Math.abs(ball.position[1] - this.position[1]) <= ball.scaling[0] + 50.0) {
+        return true;
+      }
+    }
   }
 }
 
