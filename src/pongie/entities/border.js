@@ -6,13 +6,13 @@ import SimpleShader from '../shaders/simple_shader';
 const mat4 = require('gl-matrix').mat4;
 const vec3 = require('gl-matrix').vec3;
 
-class Paddle extends Entity {
-  constructor(game, x = 0.0) {
+class Border extends Entity {
+  constructor(game, y = 0.0) {
     const vertices = [
-      -10.0, -50.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-      -10.0,  50.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-       10.0,  50.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-       10.0, -50.0, 0.0, 1.0, 1.0, 1.0, 1.0
+        0.0,  0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+        0.0, 10.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+      800.0, 10.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+      800.0,  0.0, 0.0, 1.0, 1.0, 1.0, 1.0
     ];
 
     const indices = [
@@ -20,10 +20,10 @@ class Paddle extends Entity {
       3, 1, 2
     ];
 
-    let transformation = mat4.translate(mat4.create(), mat4.create(), vec3.fromValues(x, 150.0, 0.0));
+    let transformation = mat4.translate(mat4.create(), mat4.create(), vec3.fromValues(0.0, y, 0.0));
 
     super(game, new SimpleShader(game.renderer), vertices, indices, 'TRIANGLES', transformation);
   }
 }
 
-export default Paddle;
+export default Border;

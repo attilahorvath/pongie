@@ -5,7 +5,7 @@ const vec2 = require('gl-matrix').vec2;
 const vec4 = require('gl-matrix').vec4;
 
 class Renderer {
-  constructor(dimensions = vec2.fromValues(1024, 768)) {
+  constructor(dimensions = vec2.fromValues(800, 600)) {
     this.dimensions = vec2.clone(dimensions);
 
     this.canvas = document.createElement('canvas');
