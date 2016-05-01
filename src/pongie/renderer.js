@@ -13,13 +13,10 @@ class Renderer {
     this.canvas.width = this.dimensions[0];
     this.canvas.height = this.dimensions[1];
 
-    this.viewport = vec4.fromValues(0, 0, this.dimensions[0], this.dimensions[1]);
-
     document.body.appendChild(this.canvas);
 
     this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
 
-    this.gl.viewport(this.viewport[0], this.viewport[1], this.viewport[2], this.viewport[3]);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     this.gl.enable(this.gl.BLEND);
@@ -29,12 +26,22 @@ class Renderer {
     this.projection = mat4.create();
     mat4.ortho(this.projection, 0, this.dimensions[0], this.dimensions[1], 0, -1, 1);
 
+    this.setViewport(vec4.fromValues(0, 0, this.dimensions[0], this.dimensions[1]));
+
     this.vertexBuffer = null;
     this.indexBuffer = null;
     this.shader = null;
 
     this.enabledVertexAttributeArrays = {};
     this.uniformValues = new Map();
+  }
+
+  setViewport(viewport) {
+    if (viewport !== this.viewport) {
+      this.gl.viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+      this.viewport = vec4.clone(viewport);
+    }
   }
 
   bindVertexBuffer(vertexBuffer) {
@@ -85,21 +92,25 @@ class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
-  draw(shader, vertexBuffer, indexBuffer, mode, count, transformation = mat4.create()) {
+  draw(shader, vertexBuffer, indexBuffer, transformation = mat4.create(), useProjection = true, mode = 'TRIANGLES', count = -1) {
     this.bindVertexBuffer(vertexBuffer);
     this.bindIndexBuffer(indexBuffer);
 
     shader.setVertexAttributes();
 
     shader.modelViewValue = transformation;
-    shader.projectionValue = this.projection;
+    shader.projectionValue = useProjection ? this.projection : mat4.create();
 
     shader.use();
 
+    if (count === -1) {
+      count = indexBuffer ? indexBuffer.elementCount : vertexBuffer.elementCount / shader.elementCount;
+    }
+
     if (indexBuffer) {
-      this.gl.drawElements(mode, count, this.gl.UNSIGNED_SHORT, 0);
+      this.gl.drawElements(this.gl[mode], count, this.gl.UNSIGNED_SHORT, 0);
     } else {
-      this.gl.drawArrays(mode, 0, count);
+      this.gl.drawArrays(this.gl[mode], 0, count);
     }
   }
 }

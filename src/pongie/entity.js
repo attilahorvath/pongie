@@ -33,7 +33,7 @@ class Entity {
   }
 
   draw() {
-    this.renderer.draw(this.shader, this.vertexBuffer, this.indexBuffer, this.renderer.gl[this.type], (this.indexBuffer ? this.indexBuffer.elementCount : this.vertexBuffer.elementCount / this.shader.elementCount), this.transformation);
+    this.renderer.draw(this.shader, this.vertexBuffer, this.indexBuffer, this.transformation, true, this.type);
   }
 
   integrateValues(deltaTime) {
